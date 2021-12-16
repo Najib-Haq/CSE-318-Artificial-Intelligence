@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 NO_OF_BINS = 6
 NO_OF_MARBELS = 24
@@ -14,6 +15,15 @@ class Side:
         # the store is the end of the bins
         self.bins, self.playable_marbels = self.initialize()
         self.store = 0
+
+    def copy(self):
+        # dont copy other else no connection
+        # other_side = self.other_side
+        # if other_side is not None: other_side.bins = self.other_side.bins.copy()
+        s = Side(self.player, self.other_side)
+        s.bins = self.bins.copy()
+        s.playable_marbels, s.store = copy.copy(self.playable_marbels), copy.copy(self.store)
+        return s
 
     def set_other_side(self, other_side):
         self.other_side = other_side
@@ -46,7 +56,6 @@ class Side:
             self.other_side.bins[opposition_idx] = 0
             return True
         return False
-
 
     def add_2_bins(self, bin_idx, no_of_marbels, player):
         '''
@@ -85,4 +94,21 @@ class Side:
         # if no marbels left, then this was last marbel and player can go again
         else: 
             return True
-    
+
+    def game_end(self):
+        return self.playable_marbels == 0
+
+
+    ########## heuristics
+    def heuristic1(self):
+        # (stones_in_my_storage – stones_in_opponents_storage)
+        return self.store - self.other_side.store 
+
+    def heuristic2(self, W1, W2):
+        # W1 * (stones_in_my_storage – stones_in_opponents_storage) + W2 * (stones_on_my_side - stones_on_opponents_side)
+        val1 = self.store - self.other_side.store
+        val2 = self.bins.sum() - self.other_side.bins.sum()
+        return W1*val1 + W2*val2
+
+    def heuristic3(self, W1, W2, W3, additional_moves):
+        return self.heuristic2(W1, W2) + W3*additional_moves
