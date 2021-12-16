@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.core.defchararray import decode
 
 from Board import *
 from Node import *
@@ -27,10 +28,11 @@ class Game:
                  self.player_heuristic if player == self.player else self.pc_heuristic,
                  self.player_hr_args if player == self.player else self.pc_hr_args
         )
-        max_val = minmax(n, self.additional_args['depth'], -np.inf, np.inf)
+        max_val = minmax(n, player, self.additional_args['depth'], -np.inf, np.inf)
         if(n.successors is None):
-            print("Problem with:")
-            n.board.print()
+            print("Problem with:", max_val)
+            n.gen_successors()
+            # n.board.print()
             return -1
         else:
             for child in n.successors:
@@ -81,8 +83,8 @@ class Game:
 
 
 if __name__ == "__main__":
-    g = Game("pc", True)
-    g.set_heuristic(1, [], 1, [])
+    g = Game("pc", False)
+    g.set_heuristic(1, [], 1, [], depth=5)
     g.game()
 
     

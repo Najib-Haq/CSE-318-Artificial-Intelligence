@@ -19,14 +19,13 @@ class Node:
         self.heuristic = heuristic
         self.heuristic_args = h_args
 
-    def get_heuristic(self):
-        min_max_weight = 1 if self.player == 0 else -1
+    def get_heuristic(self, max_player):
         if self.heuristic == 1:
-            return min_max_weight*self.side.heuristic1()
+            return self.board.heuristic1(max_player)
         elif self.heuristic == 2:
-            return min_max_weight*self.side.heuristic2(self.heuristic_args[0], self.heuristic_args[1])
+            return self.board.heuristic2(max_player, self.heuristic_args[0], self.heuristic_args[1])
         elif self.heuristic == 3:
-            return min_max_weight*self.side.heuristic3(self.heuristic_args[0], self.heuristic_args[1], self.heuristic_args[2])
+            return self.board.heuristic3(max_player, self.heuristic_args[0], self.heuristic_args[1], self.heuristic_args[2])
 
     def game_end(self):
         return self.side.game_end()

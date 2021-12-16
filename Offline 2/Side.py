@@ -48,7 +48,7 @@ class Side:
         # if marbels exits in opposition bin: capture them
         if self.other_side.bins[opposition_idx] > 0:
             # add marbels to own store
-            self.bins[-1] += self.other_side.bins[opposition_idx] + self.bins[idx]
+            self.store += self.other_side.bins[opposition_idx] + self.bins[idx]
             # adjust playable marbels numbers
             self.playable_marbels -= self.bins[idx]
             self.other_side.playable_marbels -= self.other_side.bins[opposition_idx]
@@ -96,19 +96,5 @@ class Side:
             return True
 
     def game_end(self):
-        return self.playable_marbels == 0
-
-
-    ########## heuristics
-    def heuristic1(self):
-        # (stones_in_my_storage – stones_in_opponents_storage)
-        return self.store - self.other_side.store 
-
-    def heuristic2(self, W1, W2):
-        # W1 * (stones_in_my_storage – stones_in_opponents_storage) + W2 * (stones_on_my_side - stones_on_opponents_side)
-        val1 = self.store - self.other_side.store
-        val2 = self.bins.sum() - self.other_side.bins.sum()
-        return W1*val1 + W2*val2
-
-    def heuristic3(self, W1, W2, W3, additional_moves):
-        return self.heuristic2(W1, W2) + W3*additional_moves
+        # return self.playable_marbels == 0
+        return self.bins.sum() == 0 or self.other_side.bins.sum() == 0

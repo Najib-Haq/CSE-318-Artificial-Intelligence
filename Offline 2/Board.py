@@ -47,8 +47,9 @@ class Board:
         '''
         # if self.side1.playable_marbels == 0: winner = self.side2
         # elif self.side2.playable_marbels == 0: winner = self.side1
-        if self.side1.bins.sum() == 0: winner = self.side2
-        elif self.side2.bins.sum() == 0: winner = self.side1
+        if (self.side1.bins.sum() == 0 or self.side2.bins.sum() == 0):
+            if self.side1.store >= self.side2.store: winner = self.side1
+            else: winner = self.side2
         else: return False, None
 
         for marbels in winner.bins:
@@ -61,7 +62,21 @@ class Board:
         space = f"store {self.side2.store}"
         print(space, self.side2.bins[::-1])
         print(" "*len(space), self.side1.bins, "; store: ", self.side1.store)
-    
+
+
+    ########## heuristics
+    def heuristic1(self, player):
+        # (stones_in_my_storage – stones_in_opponents_storage)
+        return self.sides[player].store - self.sides[1-player].store 
+
+    def heuristic2(self, player, W1, W2):
+        # W1 * (stones_in_my_storage – stones_in_opponents_storage) + W2 * (stones_on_my_side - stones_on_opponents_side)
+        val1 = self.sides[player].store - self.sides[1-player].store
+        val2 = self.sides[player].bins.sum() - self.sides[1-player].bins.sum()
+        return W1*val1 + W2*val2
+
+    def heuristic3(self, player, W1, W2, W3, additional_moves):
+        return self.heuristic2(player, W1, W2) + W3*additional_moves
 
 if __name__ == '__main__':
     board = Board()
