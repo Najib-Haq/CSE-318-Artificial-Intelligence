@@ -15,6 +15,8 @@ class Side:
         # the store is the end of the bins
         self.bins, self.playable_marbels = self.initialize()
         self.store = 0
+        self.free_move = False
+        self.has_captured = False
 
     def copy(self):
         # dont copy other else no connection
@@ -23,6 +25,7 @@ class Side:
         s = Side(self.player, self.other_side)
         s.bins = self.bins.copy()
         s.playable_marbels, s.store = copy.copy(self.playable_marbels), copy.copy(self.store)
+        s.free_move, s.has_captured = copy.copy(self.free_move), copy.copy(self.has_captured)
         return s
 
     def set_other_side(self, other_side):
@@ -33,10 +36,16 @@ class Side:
         # store at the end so add 1 to NO_OF_BINS
         return np.array([initial_bin_count] * NO_OF_BINS), NO_OF_MARBELS
 
+    def marbels_close_2_storage(self):
+        count = 0
+        for i in range(NO_OF_BINS):
+            # only gets the count of stones which wouldnt overflow to opponent
+            count += max(NO_OF_BINS-i, self.bins[i])
+        return count
 
     # TODO : only happens if lies on own side?
     # This can occur after going around once  
-    def check_capture(self, idx):
+    def check_capture(self, idx, execute=True):
         '''
         Checks if the capture move can occur. If yes then it is executed.
         idx - index of last marbel place
@@ -45,8 +54,9 @@ class Side:
         if (self.bins[idx] != 1): return False
 
         opposition_idx = (NO_OF_BINS-1) - idx
-        # if marbels exits in opposition bin: capture them
+        # if marbels exits in opposition bin: capture them if execute=True
         if self.other_side.bins[opposition_idx] > 0:
+            if not execute: return True
             # add marbels to own store
             self.store += self.other_side.bins[opposition_idx] + self.bins[idx]
             # adjust playable marbels numbers
@@ -66,6 +76,10 @@ class Side:
 
         returns whether current player can go again
         '''
+        # initialize
+        self.free_move = False
+        self.has_captured = False
+
         # counter clockwise move from bin_idx to store to opponenet side
         idx = bin_idx
         for idx in range(bin_idx, NO_OF_BINS): 
@@ -76,7 +90,7 @@ class Side:
                 if player != self.player:
                     return False # no more marbels left
                 else:
-                    self.check_capture(idx)
+                    self.has_captured = self.check_capture(idx)
                     break
             
         # send to store if marbels still left
@@ -88,12 +102,14 @@ class Side:
             else: 
                 return False
         
+        # TODO : check this return 
         # send to opposition 1st bin if marbels still left
         if(no_of_marbels > 0):
-            return self.other_side.add_2_bins(0, no_of_marbels, player)
+           self.free_move = self.other_side.add_2_bins(0, no_of_marbels, player)
         # if no marbels left, then this was last marbel and player can go again
-        else: 
-            return True
+        else:
+            self.free_move = True 
+        return self.free_move
 
     def game_end(self):
         # return self.playable_marbels == 0

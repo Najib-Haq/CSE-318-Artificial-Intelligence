@@ -17,7 +17,7 @@ def minmax(node, max_player, depth, alpha=None, beta=None):
     # print(child_nodes)
         
     # max is playing
-    if node.player == PLAYER_ONE:
+    if node.player == max_player:
         best_val = -np.inf # -infinity
         for child in child_nodes:
             val = minmax(child, max_player, depth-1, alpha, beta)
@@ -26,10 +26,8 @@ def minmax(node, max_player, depth, alpha=None, beta=None):
             # if alpha-beta pruning
             if alpha is not None and beta is not None:
                 alpha = max(best_val, alpha)
-                print(alpha, beta)
                 # prune
                 if alpha >= beta:
-                    print('prune')
                     break
     
     # if min is playing
@@ -43,9 +41,7 @@ def minmax(node, max_player, depth, alpha=None, beta=None):
             if alpha is not None and beta is not None:
                 beta = min(best_val, beta)
                 # prune
-                print(alpha, beta)
                 if alpha >= beta:
-                    print('prune')
                     break
 
     node.value = best_val

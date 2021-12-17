@@ -1,5 +1,6 @@
 import numpy as np
-from numpy.core.defchararray import decode
+from tqdm import tqdm
+import gc
 
 from Board import *
 from Node import *
@@ -41,9 +42,10 @@ class Game:
 
     def game_play_human(self):
         turn = 0
+        self.board.print()
         while(True):
             if turn == self.player: 
-                print("PLAYER ", turn, " ENTER MOVE: ")
+                print("PLAYER ", turn, " ENTER MOVE: ", end=" ")
                 idx = int(input())
             else:
                 idx = self.get_next_move(turn)
@@ -52,9 +54,9 @@ class Game:
             if not valid_idx: print("Please enter valid index")
             turn = 1 - turn if not same_turn else turn
             self.board.print()
-            print("#"*50)
+            print("#"*70)
             finish, winner = self.board.check_if_empty()
-            print("FINISH : ", finish)
+            # print("FINISH : ", finish)
             if finish: break
         print("WINNER IS ", winner)
         return winner
@@ -67,10 +69,10 @@ class Game:
             if(not self.board.select_bin(idx, turn)[1]):
                 turn = 1 - turn
             self.board.print()
-            print("#"*50)
-            print(self.board.side1.playable_marbels, self.board.side2.playable_marbels)
+            print("#"*80)
+            # print(self.board.side1.playable_marbels, self.board.side2.playable_marbels)
             finish, winner = self.board.check_if_empty()
-            print("FINISH : ", finish)
+            # print("FINISH : ", finish)
             if finish: break
         print("WINNER IS ", winner)
         return winner
@@ -81,10 +83,21 @@ class Game:
         if self.player_media == "human":
             return self.game_play_human()
 
+def play_100_games():
+    win_loss_ratio = 0
+    for i in tqdm(range(100), total=100):
+        g = Game("pc", False)
+        g.set_heuristic(3, [0.5, 0.25, 0.25], 2, [0.5, 0.5], depth=6)
+        winner = g.game_play_pc()
+        if winner == g.player: win_loss_ratio += 1
+    # gc.collect()
+    return win_loss_ratio
+
 
 if __name__ == "__main__":
     g = Game("pc", False)
-    g.set_heuristic(1, [], 1, [], depth=5)
+    g.set_heuristic(1, [], 1, [], depth=6)
     g.game()
+    # print(play_100_games(), "%")
 
     

@@ -26,6 +26,13 @@ class Node:
             return self.board.heuristic2(max_player, self.heuristic_args[0], self.heuristic_args[1])
         elif self.heuristic == 3:
             return self.board.heuristic3(max_player, self.heuristic_args[0], self.heuristic_args[1], self.heuristic_args[2])
+        elif self.heuristic == 4:
+            return self.board.heuristic4(max_player, self.heuristic_args[0], self.heuristic_args[1], self.heuristic_args[2])
+        elif self.heuristic == 5:
+            return self.board.heuristic5(max_player, self.heuristic_args[0], self.heuristic_args[1])
+        elif self.heuristic == 6:
+            return self.board.heuristic6(max_player, self.heuristic_args[0], self.heuristic_args[1])
+
 
     def game_end(self):
         return self.side.game_end()
