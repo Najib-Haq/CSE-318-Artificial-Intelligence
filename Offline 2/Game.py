@@ -16,18 +16,21 @@ class Game:
         self.pc_hr_args = []
         self.player_hr_args = []
         self.additional_args = {}
+        self.move_order = []
 
-    def set_heuristic(self, pc_hr, pc_hr_args, player_hr=None, player_hr_args=None, depth=3):
+    def set_heuristic(self, pc_hr, pc_hr_args, player_hr=None, player_hr_args=None, depth=3, move_order=None):
         self.pc_heuristic = pc_hr
         self.player_heuristic = player_hr
         self.pc_hr_args = pc_hr_args
         self.player_hr_args = player_hr_args
         self.additional_args['depth'] = depth
+        self.move_order = move_order if move_order is not None else range(NO_OF_BINS)
 
     def get_next_move(self, player):
         n = Node(player, self.board, -1, 0,
                  self.player_heuristic if player == self.player else self.pc_heuristic,
-                 self.player_hr_args if player == self.player else self.pc_hr_args
+                 self.player_hr_args if player == self.player else self.pc_hr_args,
+                 move_order=self.move_order
         )
         max_val = minmax(n, player, self.additional_args['depth'], -np.inf, np.inf)
         if(n.successors is None):
@@ -61,20 +64,21 @@ class Game:
         print("WINNER IS ", winner)
         return winner
 
-    def game_play_pc(self):
+    def game_play_pc(self, verbose=True):
         turn = 0
         while(True):
             idx = self.get_next_move(turn)
-            print("PLAYER ", turn, " move : ", idx)
+            if verbose: print("PLAYER ", turn, " move : ", idx)
             if(not self.board.select_bin(idx, turn)[1]):
                 turn = 1 - turn
-            self.board.print()
-            print("#"*80)
+            if verbose: 
+                self.board.print()
+                print("#"*80)
             # print(self.board.side1.playable_marbels, self.board.side2.playable_marbels)
             finish, winner = self.board.check_if_empty()
             # print("FINISH : ", finish)
             if finish: break
-        print("WINNER IS ", winner)
+        if verbose: print("WINNER IS ", winner)
         return winner
 
     def game(self):
@@ -83,21 +87,12 @@ class Game:
         if self.player_media == "human":
             return self.game_play_human()
 
-def play_100_games():
-    win_loss_ratio = 0
-    for i in tqdm(range(100), total=100):
-        g = Game("pc", False)
-        g.set_heuristic(3, [0.5, 0.25, 0.25], 2, [0.5, 0.5], depth=6)
-        winner = g.game_play_pc()
-        if winner == g.player: win_loss_ratio += 1
-    # gc.collect()
-    return win_loss_ratio
 
 
 if __name__ == "__main__":
-    g = Game("pc", False)
-    g.set_heuristic(1, [], 1, [], depth=6)
-    g.game()
-    # print(play_100_games(), "%")
+    np.random.seed(42)
+    # g = Game("pc", False)
+    # g.set_heuristic(1, [], 1, [], depth=6)
+    # g.game()
 
     

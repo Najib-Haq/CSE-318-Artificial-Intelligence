@@ -4,7 +4,7 @@ from Side import *
 from Board import *
 
 class Node:
-    def __init__(self, player, board, move=-1, add_turn=0, heuristic=1, h_args=[]):
+    def __init__(self, player, board, move=-1, add_turn=0, heuristic=1, h_args=[], move_order=None):
         self.player = player
         self.board = board # player board
         self.side = self.board.sides[self.player] # get players own side
@@ -14,6 +14,7 @@ class Node:
         self.successors = None
         self.heuristic = heuristic # get heuristic number
         self.heuristic_args = h_args # heuristic args
+        self.move_order = move_order if move_order is not None else range(NO_OF_BINS)
 
     def set_heuristic(self, heuristic, h_args):
         self.heuristic = heuristic
@@ -41,7 +42,7 @@ class Node:
         nodes = []
         # select which bin to select
         old_board = self.board.get_board()
-        for idx in range(0, NO_OF_BINS):
+        for idx in self.move_order:
             valid_idx, same_player_turn = self.board.select_bin(idx, self.player)
             # if bin in this index is empty; continue
             if not valid_idx:
@@ -54,7 +55,8 @@ class Node:
                 idx, 
                 add_turn,
                 self.heuristic,
-                self.heuristic_args
+                self.heuristic_args,
+                self.move_order
             )
             nodes.append(next_node)
             self.board.set_board(old_board[0], old_board[1])# get prev board
