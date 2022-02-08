@@ -18,12 +18,13 @@ if __name__ == "__main__":
         while(True):
             line = file.readline().rstrip('\n').split(" ")
             # increase one time step
-            grid_o.increase_time_step()
-            print(">>After Time Step :")
-            grid_o.show_grid()
+            
+            # print(">>After Time Step :")
+            # grid_o.show_grid()
 
             print(line)
             if line[0].upper() == "R":
+                grid_o.increase_time_step()
                 grid_o.observation((int(line[1]), int(line[2])), int(line[3]))
                 print(">>After Observation :")
                 grid_o.show_grid()

@@ -46,8 +46,6 @@ class Grid:
         # print(self.ghost.position)
         
     def increase_time_step(self):
-        self.ghost.get_next_move()
-        print("Casper moved here : ", self.ghost.position)
         self.time_lapse()
         self.time_step += 1
 

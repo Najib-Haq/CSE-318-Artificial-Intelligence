@@ -8,8 +8,6 @@ class Ghost:
         '''
         self.all_moves = self.find_all_moves(grid)
         self.all_prev_moves = self.find_all_prev_moves()
-        self.position = list(self.all_moves.keys())[np.random.choice(len(self.all_moves.keys()))]
-        print("Initial Position : ", self.position)
 
     def find_all_moves(self, grid):
         '''
@@ -57,17 +55,6 @@ class Ghost:
 
                     all_moves[(i, j)] = edge_sharing_moves + corner_sharing_moves
         return all_moves
-
-    def get_next_move(self):
-        valid_moves = self.all_moves[self.position]
-        random_number = np.random.random() 
-        #print(random_number)
-        cumulative_random = 0
-        for i in range(len(valid_moves)):
-            cumulative_random += valid_moves[i][2] # probability
-            if cumulative_random >= random_number:
-                self.position = (valid_moves[i][0], valid_moves[i][1])
-                break
 
     def find_all_prev_moves(self):
         '''
